@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+target/
+src-tauri/target/
+
+# environment / secrets
+.env
+.env.*
+*.local
+
+# logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Tauri
+src-tauri/gen/
+src-tauri/icons/*.ico
+src-tauri/icons/*.icns
+
+# local app data / databases
+*.db
+*.sqlite
+*.sqlite3
+
+# credentials / tokens
+credentials.json
+token.json
+tokens.json
+client_secret*.json
+google-oauth*.json
