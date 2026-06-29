@@ -1,0 +1,139 @@
+//! Purpose: host Spike 1 desktop shell behavior for the validation app.
+//! Responsibilities: tray setup, background window handling, autostart plugin registration.
+//! Inputs: Tauri lifecycle events and tray menu interactions.
+//! Outputs: a running desktop shell that can hide, reopen, and quit predictably.
+//! Non-responsibilities: Google APIs, AI generation, meeting logic, or persistent storage.
+
+use serde::Serialize;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Manager, WindowEvent,
+};
+
+#[derive(Serialize)]
+struct WindowState {
+    visible: bool,
+    focused: bool,
+    minimized: bool,
+}
+
+fn main_window(app: &AppHandle) -> Result<tauri::WebviewWindow, String> {
+    app.get_webview_window("main")
+        .ok_or_else(|| "main window not found".to_string())
+}
+
+fn read_window_state(window: &tauri::WebviewWindow) -> WindowState {
+    WindowState {
+        visible: window.is_visible().unwrap_or(false),
+        focused: window.is_focused().unwrap_or(false),
+        minimized: window.is_minimized().unwrap_or(false),
+    }
+}
+
+fn set_window_hidden_from_taskbar(window: &tauri::WebviewWindow, hidden: bool) {
+    #[cfg(target_os = "windows")]
+    {
+        let _ = window.set_skip_taskbar(hidden);
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    let _ = (window, hidden);
+}
+
+fn restore_main_window_impl(app: &AppHandle) -> Result<WindowState, String> {
+    let window = main_window(app)?;
+
+    set_window_hidden_from_taskbar(&window, false);
+    let _ = window.show();
+    let _ = window.unminimize();
+    let _ = window.set_focus();
+
+    Ok(read_window_state(&window))
+}
+
+fn hide_main_window_impl(app: &AppHandle) -> Result<WindowState, String> {
+    let window = main_window(app)?;
+
+    let _ = window.unminimize();
+    set_window_hidden_from_taskbar(&window, true);
+    let _ = window.hide();
+
+    Ok(read_window_state(&window))
+}
+
+#[tauri::command]
+fn restore_main_window(app: AppHandle) -> Result<WindowState, String> {
+    restore_main_window_impl(&app)
+}
+
+#[tauri::command]
+fn hide_main_window(app: AppHandle) -> Result<WindowState, String> {
+    hide_main_window_impl(&app)
+}
+
+#[tauri::command]
+fn get_main_window_state(app: AppHandle) -> Result<WindowState, String> {
+    let window = main_window(&app)?;
+    Ok(read_window_state(&window))
+}
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::Builder::new().build())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            let open_item =
+                MenuItem::with_id(app, "open", "Open Meeting Prep Assistant", true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&open_item, &quit_item])?;
+            let app_handle = app.handle().clone();
+
+            TrayIconBuilder::with_id("main-tray")
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .tooltip("Meeting Prep Assistant")
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_tray_icon_event(move |_tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let _ = restore_main_window_impl(&app_handle);
+                    }
+                })
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "open" => {
+                        let _ = restore_main_window_impl(app);
+                    }
+                    "quit" => {
+                        app.exit(0);
+                    }
+                    _ => {}
+                })
+                .build(app)?;
+
+            Ok(())
+        })
+        .on_window_event(|window, event| {
+            if window.label() != "main" {
+                return;
+            }
+
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = hide_main_window_impl(&window.app_handle());
+            }
+        })
+        .invoke_handler(tauri::generate_handler![
+            restore_main_window,
+            hide_main_window,
+            get_main_window_state
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

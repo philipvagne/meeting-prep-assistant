@@ -1,0 +1,144 @@
+:root {
+  color: #f5f3ed;
+  background:
+    radial-gradient(circle at top, rgba(244, 166, 97, 0.22), transparent 35%),
+    linear-gradient(180deg, #18222b 0%, #0e141a 100%);
+  font-family: "Segoe UI", sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: #f4a661;
+  color: #1a1a1a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button.secondary {
+  background: #304250;
+  color: #f5f3ed;
+}
+
+#root {
+  width: 100%;
+}
+
+.app-shell {
+  width: min(980px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 56px;
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #f4a661;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.hero h1,
+.panel h2 {
+  margin: 0;
+}
+
+.intro {
+  max-width: 60ch;
+  color: #c7d0d7;
+}
+
+.panel {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid rgba(244, 166, 97, 0.14);
+  border-radius: 18px;
+  background: rgba(24, 34, 43, 0.86);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 16px 0 0;
+}
+
+.status-grid div {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.status-grid dt {
+  margin-bottom: 6px;
+  color: #f4a661;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.status-grid dd {
+  margin: 0;
+  color: #f5f3ed;
+}
+
+ul {
+  padding-left: 20px;
+  color: #d8e0e6;
+}
+
+.status-message {
+  margin: 16px 0 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(244, 166, 97, 0.1);
+  color: #ffe3c7;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: min(100% - 20px, 980px);
+    padding-top: 24px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+}

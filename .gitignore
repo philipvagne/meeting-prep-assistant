@@ -48,3 +48,5 @@ google-oauth*.json
 tmp/
 temp/
 .cache/
+.npm-cache/
+temp-tauri-ref/
