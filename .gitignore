@@ -38,3 +38,13 @@ token.json
 tokens.json
 client_secret*.json
 google-oauth*.json
+
+# AI providers
+.openai
+.anthropic
+.gemini
+
+# temporary files
+tmp/
+temp/
+.cache/
