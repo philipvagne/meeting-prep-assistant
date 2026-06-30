@@ -302,38 +302,24 @@ The architecture should be proven practical before investing significant effort 
 
 * Delays production development until validation is complete.
 
-# Decision 009
+## Decision 009 — AI provider strategy
 
-**Status:** Accepted
+**Status**: Accepted
 
-## Decision
-Use native Windows toast notifications (via Tauri's notification plugin / WinRT) for meeting reminders, rather than custom in-app overlay windows.
+**Decision**: Use user-configured AI providers for the portfolio version, while keeping the architecture open for a future backend-managed AI service.
 
-## Context
+**Reason**: avoids developer API cost risk, keeps the app testable by technical users, preserves privacy-first/local-first architecture, and does not block future commercial release.
 
-The project introduces multiple technical unknowns, including desktop architecture, Google OAuth, notifications, and AI integration.
+## Decision 010 – Portfolio AI Strategy
 
-## Alternatives Considered
+The portfolio version of Meeting Prep Assistant will support user-configured AI providers (initially OpenAI and Gemini). This keeps the application downloadable, privacy-first, and inexpensive to maintain while avoiding embedding developer API keys.
 
-* Begin implementation immediately.
-* Validate architecture through engineering spikes first.
+The architecture intentionally isolates AI provider integration behind an abstraction layer so a future backend-managed AI service can replace user-configured providers without major architectural changes.
 
-## Reason
+## Decision 011 — AI Provider Abstraction
 
-Tauri windows can't render visible UI when minimized/unfocused; native toasts are the only reliable mechanism for background notification delivery on Windows. Also aligns with future MSIX/Store packaging requirements (AUMID).
+The application communicates with AI through a provider abstraction rather than directly with a specific vendor.
 
-## Alternatives considered: 
+The portfolio version initially supports user-configured providers (Gemini and OpenAI). Additional providers can be added by implementing the common AI provider interface.
 
-custom always-on-top borderless window (rejected — doesn't work when app is closed/backgrounded, no Action Center integration, more engineering for less reliability).
-
-## Consequences
-
-**Positive**
-
-* Lower implementation risk.
-* Higher confidence in architectural decisions.
-* Better long-term maintainability.
-
-**Negative**
-
-* notification styling constrained to Windows toast template system; interactive toast actions will likely require proper AUMID setup, which should be validated before relying on toast buttons (e.g. "snooze"/"view brief" actions).
+This design intentionally allows a future backend-managed AI service without requiring changes to the rest of the application.

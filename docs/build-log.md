@@ -309,3 +309,110 @@ Future iterations should improve search relevance through:
 ### Outcome
 
 Spike 3 is now documented as `Core functionality validated`.
+
+## 2026-06-30 - Spike 4 brief generation and notification validation flow
+
+### Summary
+
+Added the first manual brief-generation validation flow so the desktop app can turn already-collected Calendar, Gmail, and Drive context into a concise source-backed meeting brief and raise a native notification when the brief is ready.
+
+### Changes
+
+- Added a Rust-side brief-generation module for:
+  - local AI-provider status reporting
+  - local AI-provider configuration storage
+  - Windows-backed protected storage of the OpenAI API key
+  - minimal prompt construction from selected-event context only
+  - source-reference packaging for Calendar, Gmail, and Drive inputs
+  - OpenAI Responses API invocation with validation-safe output extraction
+- Added new desktop commands to:
+  - save local AI-provider configuration
+  - report AI-provider configuration status
+  - generate a meeting brief from collected context
+- Updated the validation UI to:
+  - accept a local OpenAI API key and model
+  - show AI-provider configuration status
+  - generate a brief manually after context collection
+  - display the generated brief and source references
+  - send a native brief-ready notification
+- Updated the desktop shell labels so the current validation build clearly identifies Spike 4.
+- Adjusted the build script to call `npx vite build`, which avoids the local Vite invocation issue seen in this environment.
+
+### Validation Notes
+
+- `npm run build` succeeded after the Spike 4 changes.
+- `cargo check` succeeded when pointed at an alternate writable target directory.
+- `npm run tauri dev` still hits a local validation limitation in this environment because port `1420` is already in use.
+- Live manual validation with real Google data and a local OpenAI API key is still required to confirm:
+  - brief usefulness
+  - citation quality
+  - low-context behavior
+  - native notification behavior in the running desktop app
+
+### Outcome
+
+Spike 4 is currently assessed as PASS WITH LIMITATIONS.
+
+## 2026-06-30 - Spike 4 AI provider abstraction with Gemini support
+
+### Summary
+
+Refactored the Spike 4 brief-generation path behind a provider-neutral backend adapter and added Google Gemini alongside the existing OpenAI validation flow.
+
+### Changes
+
+- Reworked the Rust brief-generation module so the rest of the app calls one shared brief-generation path instead of provider-specific logic.
+- Added local AI provider selection with support for:
+  - OpenAI
+  - Google Gemini
+- Stored provider configuration locally with:
+  - one selected provider
+  - one model setting per provider
+  - one DPAPI-protected API key per provider
+- Preserved the existing OpenAI path while adding Gemini request dispatch and response parsing.
+- Updated the React validation UI to:
+  - select the active AI provider
+  - save provider-specific API keys and models
+  - show per-provider readiness
+  - display which provider and model generated the brief
+
+### Validation Notes
+
+- `npm run build` succeeded after the provider-abstraction changes.
+- `cargo check` succeeded when pointed at an alternate writable target directory.
+- Live desktop validation still needs to confirm:
+  - Gemini brief generation on real meeting examples
+  - OpenAI brief generation still works end to end
+  - provider-specific error messages are clear during manual testing
+  - no secrets appear in runtime logs during live validation
+
+### Outcome
+
+Spike 4 now supports a provider abstraction for OpenAI and Gemini and remains assessed as PASS WITH LIMITATIONS pending live manual validation.
+
+## 2026-06-30 - Spike 4 live validation completed with limitations
+
+### Summary
+
+Completed live Spike 4 validation and confirmed that the provider-neutral brief-generation path works end to end in the desktop app.
+
+### Validated Findings
+
+- AI provider abstraction works.
+- Google Gemini brief generation completed successfully.
+- The OpenAI provider path remains available.
+- Provider API keys are stored locally only.
+- Calendar, Gmail, and Drive context is passed into the AI layer.
+- Generated briefs include source references.
+- Generated briefs display inside the app.
+- A native Windows notification appears when the brief is ready.
+
+### Limitations
+
+- Brief format and content quality are not final.
+- Prompt design still needs future iteration.
+- Generated markdown still needs future UI rendering and presentation work.
+
+### Outcome
+
+Spike 4 is now validated and assessed as PASS WITH LIMITATIONS.

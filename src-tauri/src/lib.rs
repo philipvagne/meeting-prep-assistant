@@ -1,13 +1,18 @@
 //! Purpose: host desktop validation behavior for the spike application.
 //! Responsibilities: tray setup, background window handling, autostart plugin registration,
-//! and Spike 3 Google Workspace validation command wiring.
+//! and Spike 4 Google Workspace validation command wiring.
 //! Inputs: Tauri lifecycle events, tray interactions, and frontend command invocations.
 //! Outputs: a running validation shell with Google auth, Calendar retrieval,
-//! and Gmail / Drive context-collection hooks.
+//! Gmail / Drive context collection, and manual brief-generation hooks.
 //! Non-responsibilities: AI generation, meeting logic, or final product UX.
 
+mod brief_generation;
 mod google_auth;
 
+use brief_generation::{
+    generate_meeting_brief_impl, get_ai_provider_status_impl, save_ai_provider_config_impl,
+    AiProviderStatus, GeneratedMeetingBrief, SaveAiProviderConfigRequest,
+};
 use google_auth::{
     collect_meeting_context_impl, connect_google_impl, disconnect_google_impl,
     fetch_upcoming_calendar_events_impl, get_google_auth_status_impl,
@@ -94,12 +99,25 @@ fn get_google_auth_status(app: AppHandle) -> Result<GoogleAuthStatus, String> {
 }
 
 #[tauri::command]
+fn get_ai_provider_status(app: AppHandle) -> Result<AiProviderStatus, String> {
+    get_ai_provider_status_impl(&app)
+}
+
+#[tauri::command]
 fn save_google_client_config(
     app: AppHandle,
     client_id: String,
     client_secret: String,
 ) -> Result<GoogleAuthStatus, String> {
     save_google_client_config_impl(&app, client_id, client_secret)
+}
+
+#[tauri::command]
+fn save_ai_provider_config(
+    app: AppHandle,
+    request: SaveAiProviderConfigRequest,
+) -> Result<AiProviderStatus, String> {
+    save_ai_provider_config_impl(&app, request)
 }
 
 #[tauri::command]
@@ -120,6 +138,14 @@ async fn collect_meeting_context(
     event_id: String,
 ) -> Result<MeetingContextCollection, String> {
     collect_meeting_context_impl(&app, event_id).await
+}
+
+#[tauri::command]
+async fn generate_meeting_brief(
+    app: AppHandle,
+    context: MeetingContextCollection,
+) -> Result<GeneratedMeetingBrief, String> {
+    generate_meeting_brief_impl(&app, context).await
 }
 
 #[tauri::command]
@@ -183,10 +209,13 @@ pub fn run() {
             hide_main_window,
             get_main_window_state,
             get_google_auth_status,
+            get_ai_provider_status,
             save_google_client_config,
+            save_ai_provider_config,
             connect_google,
             fetch_upcoming_calendar_events,
             collect_meeting_context,
+            generate_meeting_brief,
             disconnect_google
         ])
         .run(tauri::generate_context!())

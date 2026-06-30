@@ -1,7 +1,7 @@
 [package]
 name = "meeting-prep-assistant"
 version = "0.1.0"
-description = "Spike 3 Gmail and Drive context collection validation app"
+description = "Spike 4 brief generation and notification validation app"
 authors = ["OpenAI Codex"]
 edition = "2021"
 

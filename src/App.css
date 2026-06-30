@@ -195,6 +195,17 @@ ul {
   gap: 12px;
 }
 
+.brief-output {
+  margin: 18px 0 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(12, 17, 22, 0.88);
+  color: #f5f3ed;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.6;
+}
+
 .status-message {
   margin: 16px 0 0;
   padding: 14px;

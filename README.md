@@ -1,6 +1,6 @@
 # Meeting Prep Assistant
 
-Spike 2 has been successfully validated. The current validation app now focuses on Spike 3 and demonstrates Google OAuth 2.0 desktop authentication plus Gmail and Google Drive read-only context collection inside the Windows Tauri shell.
+Spikes 2 and 3 have been successfully validated. The current validation app now focuses on Spike 4 and demonstrates manual meeting-brief generation plus native brief-ready notification flow inside the Windows Tauri shell.
 
 ## Commands
 
@@ -10,9 +10,17 @@ npm run tauri dev
 npm run build
 ```
 
-## Spike 3 Setup
+## Spike 4 Setup
 
-Before testing Google authentication, create a Google OAuth desktop client in Google Cloud, enable the Google Calendar API, Gmail API, and Google Drive API, and paste the desktop client ID and desktop client secret into the Spike 3 validation UI.
+Before testing Google authentication, create a Google OAuth desktop client in Google Cloud, enable the Google Calendar API, Gmail API, and Google Drive API, and paste the desktop client ID and desktop client secret into the validation UI.
+
+To validate brief generation, provide a local AI provider configuration in the Spike 4 validation UI. The validation build currently supports:
+
+- OpenAI
+- Google Gemini
+
+Each provider uses its own locally stored API key and model setting. Provider API keys are stored locally only and are not committed to the repository.
+The default Gemini validation model is `gemini-2.5-flash`.
 
 This spike requests only:
 
@@ -20,7 +28,7 @@ This spike requests only:
 - `https://www.googleapis.com/auth/gmail.readonly`
 - `https://www.googleapis.com/auth/drive.readonly`
 
-It does not request Gmail, Drive, profile, or write permissions.
+It does not request profile or write permissions.
 
 The client secret is treated as local-only configuration and must never be committed to the repository. Refresh tokens remain stored separately in DPAPI-protected local storage.
 
@@ -69,22 +77,45 @@ Future iterations should improve relevance through:
 - multiple search variants
 - semantic matching (future)
 
-## Spike 3 Scope
+## Spike 4 Validation Status
+
+Spike 4 has now been validated and is assessed as PASS WITH LIMITATIONS.
+
+Manual validation successfully demonstrated:
+
+- AI provider abstraction
+- Google Gemini brief generation
+- OpenAI provider path remains available
+- local-only provider API key storage
+- manual brief generation from already-collected context
+- Calendar, Gmail, and Drive context passed into the AI layer
+- source references in generated briefs
+- generated brief display in the app
+- native Windows notification when a brief is ready
+
+Current limitations:
+
+- brief format and content quality are not final
+- prompt design needs future iteration
+- generated markdown still needs future UI rendering and presentation work
+- tray/app restore remains the supported way to return to the brief
+
+## Spike 4 Scope
 
 This build intentionally covers only:
 
 - Google OAuth 2.0 desktop flow
-- System browser authentication
-- Secure local token persistence
-- Google Calendar read-only retrieval
-- Gmail read-only search validation
-- Google Drive read-only search validation
-- Event-seeded context collection
-- Disconnect / local sign-out validation
+- Gmail and Drive read-only context collection
+- local AI provider configuration
+- provider abstraction for OpenAI and Gemini
+- manual brief generation from selected-event context
+- source-backed brief presentation
+- brief-ready native notification
+- disconnect / local sign-out validation
 
-It intentionally does not include AI generation, meeting detection, settings, or production UI polish.
+It intentionally does not include automatic scheduling, recurring reminders, semantic search, settings, or production UI polish.
 
-## Spike 3 Security
+## Spike 4 Security
 
 This spike:
 
@@ -92,3 +123,5 @@ This spike:
 - never modifies Google data
 - uses Calendar, Gmail, and Drive read-only scopes only
 - performs all processing locally
+- stores provider API keys locally only
+- sends only selected-event validation context to the AI provider
