@@ -63,7 +63,15 @@ Evaluate:
 
 Result:
 
-PASS / PASS WITH LIMITATIONS / FAIL
+PASS
+
+Validated manually:
+
+* OAuth flow succeeds in the default browser
+* Authorization code exchange succeeds
+* Tokens persist securely across restart
+* Calendar events are retrieved successfully
+* Only Calendar read-only scope is requested
 
 ---
 

@@ -82,3 +82,110 @@ Investigated whether the current Tauri v2 desktop notification path on Windows c
 ### Outcome
 
 Spike 1 remains PASS WITH LIMITATIONS, with notification-click restore documented as unsupported for the current Tauri v2 desktop notification path on Windows.
+
+## 2026-06-30 - Spike 2 Google OAuth and Calendar validation flow
+
+### Summary
+
+Added the first Google OAuth and Calendar read-only validation flow to the Tauri desktop shell.
+
+### Changes
+
+- Replaced the Spike 1 validation UI with a Spike 2 validation surface for:
+  - saving a Google desktop OAuth client ID locally
+  - starting system-browser Google authentication
+  - fetching upcoming calendar events
+  - disconnecting and clearing local authentication
+- Added Rust-side handling for:
+  - loopback OAuth callback reception on `127.0.0.1`
+  - PKCE generation for the desktop OAuth flow
+  - authorization code exchange
+  - access token refresh
+  - minimal upcoming event retrieval from Google Calendar
+- Added Windows local token protection using DPAPI-backed encryption for the persisted token payload.
+- Updated README and the Spike 2 notes to document setup, scope, validation results, and limitations.
+
+### Validation Notes
+
+- `npm run build` succeeded.
+- `cargo check` succeeded when pointed at an alternate writable target directory.
+- `npm run tauri dev` compiled and launched `meeting-prep-assistant.exe` in this environment.
+- `npm run tauri build --debug` compiled the desktop app and produced `src-tauri/target/debug/meeting-prep-assistant.exe`.
+- The bundling step then failed because WiX could not be downloaded in this environment.
+- A live Google sign-in and Calendar retrieval still require manual validation with a real Google desktop OAuth client ID.
+
+### Outcome
+
+Spike 2 is currently assessed as PASS WITH LIMITATIONS.
+
+The secure local architecture path is validated, the desktop app compiles and launches, and the Google OAuth/Calendar read-only flow is implemented. Final pass confirmation for authentication, persistence, and event retrieval still requires a manual end-to-end run with real Google credentials.
+
+## 2026-06-30 - Spike 2 desktop client secret support
+
+### Summary
+
+Updated the Google OAuth validation flow to support a local-only desktop client secret after live validation showed Google's token endpoint rejecting the exchange without it.
+
+### Changes
+
+- Expanded the local Google OAuth config to store:
+  - desktop client ID
+  - desktop client secret
+- Updated the Spike 2 validation UI so the user can provide both values.
+- Added backward-compatible handling for older local config files that only contained a client ID.
+- Included the client secret in:
+  - authorization code exchange
+  - refresh token exchange
+- Added ignore rules for local token/config artifacts that should never be committed.
+
+### Validation Notes
+
+- The Google loopback callback path had already been confirmed working in live validation.
+- The token exchange failure was traced to Google's token endpoint requiring `client_secret` for the configured desktop OAuth client.
+- Build validation was rerun after the fix.
+
+### Outcome
+
+Spike 2's authentication path should now complete successfully for Google desktop OAuth clients that require both client ID and client secret during token exchange, while still requesting Calendar read-only scope only.
+
+## 2026-06-30 - Spike 2 manual validation completed
+
+### Summary
+
+Completed live manual validation for Spike 2 and confirmed that the desktop app can securely authenticate with Google and retrieve upcoming Calendar events using read-only access only.
+
+### Manual Validation Flow
+
+1. Created a Google Cloud Desktop OAuth client.
+2. Added a Google test user.
+3. Configured the desktop client ID and client secret in the validation app.
+4. Completed the browser-based Google authentication flow.
+5. Confirmed authentication status updated correctly in the app.
+6. Fetched upcoming Google Calendar events successfully.
+7. Fully closed and restarted the desktop application.
+8. Confirmed authentication persisted after restart.
+9. Confirmed the refresh token remained available after restart.
+
+### Findings
+
+- Google Desktop OAuth 2.0 authentication completed successfully.
+- OAuth launched in the user's default browser.
+- The localhost callback completed successfully.
+- The authorization code was exchanged successfully for an access token and refresh token.
+- The refresh token was stored securely using Windows-backed secure storage.
+- Authentication state persisted after fully closing and restarting the app.
+- The only requested scope was Google Calendar read-only.
+- Upcoming Calendar events were fetched and displayed successfully.
+- Disconnect functionality remained available after authentication.
+- No Gmail, Drive, profile, or write scopes were requested.
+
+### Notable Observations
+
+- Google displayed the expected unverified-app warning because the project is still in testing mode.
+- The localhost browser callback approach worked reliably for desktop authentication.
+- Secure token storage behaved as intended during restart validation.
+- Only minimal calendar metadata was displayed for validation.
+
+### Outcome
+
+Spike 2 is now COMPLETE and assessed as PASS.

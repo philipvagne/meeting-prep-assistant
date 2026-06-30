@@ -1,9 +1,17 @@
-//! Purpose: host Spike 1 desktop shell behavior for the validation app.
-//! Responsibilities: tray setup, background window handling, autostart plugin registration.
-//! Inputs: Tauri lifecycle events and tray menu interactions.
-//! Outputs: a running desktop shell that can hide, reopen, and quit predictably.
-//! Non-responsibilities: Google APIs, AI generation, meeting logic, or persistent storage.
+//! Purpose: host desktop validation behavior for the spike application.
+//! Responsibilities: tray setup, background window handling, autostart plugin registration,
+//! and Spike 2 Google OAuth / Calendar command wiring.
+//! Inputs: Tauri lifecycle events, tray interactions, and frontend command invocations.
+//! Outputs: a running validation shell with Google auth and Calendar read-only access hooks.
+//! Non-responsibilities: Gmail, Drive, AI generation, meeting logic, or final product UX.
 
+mod google_auth;
+
+use google_auth::{
+    connect_google_impl, disconnect_google_impl, fetch_upcoming_calendar_events_impl,
+    get_google_auth_status_impl, save_google_client_config_impl, CalendarEventSummary,
+    GoogleAuthStatus,
+};
 use serde::Serialize;
 use tauri::{
     menu::{Menu, MenuItem},
@@ -78,6 +86,37 @@ fn get_main_window_state(app: AppHandle) -> Result<WindowState, String> {
     Ok(read_window_state(&window))
 }
 
+#[tauri::command]
+fn get_google_auth_status(app: AppHandle) -> Result<GoogleAuthStatus, String> {
+    get_google_auth_status_impl(&app)
+}
+
+#[tauri::command]
+fn save_google_client_config(
+    app: AppHandle,
+    client_id: String,
+    client_secret: String,
+) -> Result<GoogleAuthStatus, String> {
+    save_google_client_config_impl(&app, client_id, client_secret)
+}
+
+#[tauri::command]
+async fn connect_google(app: AppHandle) -> Result<GoogleAuthStatus, String> {
+    connect_google_impl(&app).await
+}
+
+#[tauri::command]
+async fn fetch_upcoming_calendar_events(
+    app: AppHandle,
+) -> Result<Vec<CalendarEventSummary>, String> {
+    fetch_upcoming_calendar_events_impl(&app).await
+}
+
+#[tauri::command]
+fn disconnect_google(app: AppHandle) -> Result<(), String> {
+    disconnect_google_impl(&app)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -132,7 +171,12 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             restore_main_window,
             hide_main_window,
-            get_main_window_state
+            get_main_window_state,
+            get_google_auth_status,
+            save_google_client_config,
+            connect_google,
+            fetch_upcoming_calendar_events,
+            disconnect_google
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

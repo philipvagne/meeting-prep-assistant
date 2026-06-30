@@ -38,6 +38,8 @@ token.json
 tokens.json
 client_secret*.json
 google-oauth*.json
+google-tokens.protected
+.tmp-cargo-target/
 
 # AI providers
 .openai

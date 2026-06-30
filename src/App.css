@@ -40,6 +40,12 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 button.secondary {
   background: #304250;
   color: #f5f3ed;
@@ -87,6 +93,30 @@ button.secondary {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 
+.field-label {
+  display: block;
+  margin-top: 16px;
+  font-weight: 700;
+  color: #f5f3ed;
+}
+
+.text-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(244, 166, 97, 0.24);
+  border-radius: 12px;
+  background: rgba(13, 20, 26, 0.78);
+  color: #f5f3ed;
+  font: inherit;
+}
+
+.field-help,
+.empty-state {
+  margin-bottom: 0;
+  color: #c7d0d7;
+}
+
 .button-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -122,6 +152,24 @@ button.secondary {
 ul {
   padding-left: 20px;
   color: #d8e0e6;
+}
+
+.event-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.event-card {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.event-card h3,
+.event-card p {
+  margin: 0 0 8px;
 }
 
 .status-message {

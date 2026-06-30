@@ -301,3 +301,39 @@ The architecture should be proven practical before investing significant effort 
 **Negative**
 
 * Delays production development until validation is complete.
+
+# Decision 009
+
+**Status:** Accepted
+
+## Decision
+Use native Windows toast notifications (via Tauri's notification plugin / WinRT) for meeting reminders, rather than custom in-app overlay windows.
+
+## Context
+
+The project introduces multiple technical unknowns, including desktop architecture, Google OAuth, notifications, and AI integration.
+
+## Alternatives Considered
+
+* Begin implementation immediately.
+* Validate architecture through engineering spikes first.
+
+## Reason
+
+Tauri windows can't render visible UI when minimized/unfocused; native toasts are the only reliable mechanism for background notification delivery on Windows. Also aligns with future MSIX/Store packaging requirements (AUMID).
+
+## Alternatives considered: 
+
+custom always-on-top borderless window (rejected — doesn't work when app is closed/backgrounded, no Action Center integration, more engineering for less reliability).
+
+## Consequences
+
+**Positive**
+
+* Lower implementation risk.
+* Higher confidence in architectural decisions.
+* Better long-term maintainability.
+
+**Negative**
+
+* notification styling constrained to Windows toast template system; interactive toast actions will likely require proper AUMID setup, which should be validated before relying on toast buttons (e.g. "snooze"/"view brief" actions).
