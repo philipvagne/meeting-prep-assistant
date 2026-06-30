@@ -189,3 +189,123 @@ Completed live manual validation for Spike 2 and confirmed that the desktop app 
 ### Outcome
 
 Spike 2 is now COMPLETE and assessed as PASS.
+
+## 2026-06-30 - Spike 3 Gmail and Drive context collection scaffold
+
+### Summary
+
+Extended the validated Google desktop authentication flow so the app can request Gmail and Drive read-only access, select one upcoming Calendar event, and collect validation-safe Gmail and Drive context from that event.
+
+### Changes
+
+- Expanded the Google OAuth request from Calendar-only to:
+  - Calendar read-only
+  - Gmail read-only
+  - Drive read-only
+- Added backend handling for:
+  - scope-upgrade validation
+  - selected Calendar event detail retrieval
+  - Gmail message search and metadata retrieval
+  - Drive file search and metadata retrieval
+  - explicit no-result notes for low-confidence cases
+- Updated the React validation UI to:
+  - show the expanded granted scopes
+  - fetch and select upcoming Calendar events
+  - collect event-seeded Gmail and Drive context
+  - display Calendar, Gmail, and Drive sources separately
+- Updated README and Spike 3 notes to reflect the new validation scope and current status.
+
+### Validation Notes
+
+- `npm run build` succeeded.
+- `cargo check` succeeded when pointed at an alternate writable target directory.
+- Live manual validation for Gmail and Drive search has not been completed yet in this environment.
+- The implemented flow is ready to validate:
+  - scope-upgrade consent
+  - event-seeded Gmail search
+  - event-seeded Drive search
+  - no-result handling
+
+### Outcome
+
+Spike 3 is currently assessed as PASS WITH LIMITATIONS.
+
+The implementation path compiles cleanly and respects the read-only, local-first security model, but live validation is still required to confirm that Gmail and Drive relevance is good enough for real meetings.
+
+## 2026-06-30 - Spike 3 Gmail no-result parsing hardening
+
+### Summary
+
+Hardened the Gmail context lookup path so empty or unexpected Gmail list responses do not fail the full context-collection workflow.
+
+### Changes
+
+- Added defensive parsing for Gmail `messages.list` responses.
+- Added defensive parsing for Gmail message-detail responses.
+- Treated blank, `null`, string, and other non-object Gmail responses as empty result sets for validation purposes.
+- Preserved Drive context collection even when Gmail returns no usable results.
+
+### Validation Notes
+
+- `npm run build` succeeded.
+- `cargo check` succeeded when pointed at an alternate writable target directory.
+- This fix specifically targets the live validation case where selecting `Weekly Architecture Review` returned an empty-string Gmail response.
+
+### Outcome
+
+Gmail no-result cases now degrade safely to an empty Gmail result set with validation notes instead of aborting the full Calendar/Gmail/Drive context collection flow.
+
+## 2026-06-30 - Spike 3 core functionality validated
+
+### Summary
+
+Reached the main validation milestone for Spike 3 by proving that the desktop app can authenticate with Google, persist authentication locally, seed from a Calendar event, and aggregate related Gmail and Drive context inside the app.
+
+### Validation Performed
+
+- Created synthetic calendar meetings for validation.
+- Created matching Gmail messages.
+- Created matching Google Drive documents.
+- Successfully collected related context for `Project Alpha Sync`.
+- Successfully collected related context for `Architecture Review`.
+- Confirmed that testing used realistic but synthetic project data.
+
+### Validated Findings
+
+- Google OAuth 2.0 desktop authentication works.
+- Multi-scope OAuth for Calendar, Gmail, and Drive read-only access works.
+- Refresh tokens are stored securely using Windows-backed secure storage.
+- Authenticated state survives full application restart.
+- Upcoming Calendar events can be read and used as the context seed.
+- Related Gmail messages can be retrieved.
+- Related Google Drive documents can be retrieved.
+- Aggregated Calendar + Gmail + Drive context displays inside the desktop app.
+- Gmail API is enabled and validated in the current spike workflow.
+- Drive API is enabled and validated in the current spike workflow.
+
+### Known Limitation
+
+- Gmail matching currently relies primarily on meeting-title matching.
+- During validation, the meeting `Weekly Architecture Review` did not match Gmail messages such as `Architecture Review - database`.
+- After renaming the meeting to `Architecture Review`, Gmail results were discovered immediately.
+- This is being recorded as a search-strategy limitation rather than an API limitation.
+
+### Follow-up Direction
+
+Future iterations should improve search relevance through:
+
+- title normalization
+- keyword extraction
+- multiple search variants
+- semantic matching in a later phase
+
+### Security Confirmation
+
+- Only Calendar, Gmail, and Drive read-only scopes are requested.
+- No Google write permissions are requested.
+- No Google data is modified.
+- Processing remains local to the desktop app for this spike.
+
+### Outcome
+
+Spike 3 is now documented as `Core functionality validated`.

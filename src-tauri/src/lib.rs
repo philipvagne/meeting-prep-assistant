@@ -1,16 +1,18 @@
 //! Purpose: host desktop validation behavior for the spike application.
 //! Responsibilities: tray setup, background window handling, autostart plugin registration,
-//! and Spike 2 Google OAuth / Calendar command wiring.
+//! and Spike 3 Google Workspace validation command wiring.
 //! Inputs: Tauri lifecycle events, tray interactions, and frontend command invocations.
-//! Outputs: a running validation shell with Google auth and Calendar read-only access hooks.
-//! Non-responsibilities: Gmail, Drive, AI generation, meeting logic, or final product UX.
+//! Outputs: a running validation shell with Google auth, Calendar retrieval,
+//! and Gmail / Drive context-collection hooks.
+//! Non-responsibilities: AI generation, meeting logic, or final product UX.
 
 mod google_auth;
 
 use google_auth::{
-    connect_google_impl, disconnect_google_impl, fetch_upcoming_calendar_events_impl,
-    get_google_auth_status_impl, save_google_client_config_impl, CalendarEventSummary,
-    GoogleAuthStatus,
+    collect_meeting_context_impl, connect_google_impl, disconnect_google_impl,
+    fetch_upcoming_calendar_events_impl, get_google_auth_status_impl,
+    save_google_client_config_impl, CalendarEventSummary, GoogleAuthStatus,
+    MeetingContextCollection,
 };
 use serde::Serialize;
 use tauri::{
@@ -113,6 +115,14 @@ async fn fetch_upcoming_calendar_events(
 }
 
 #[tauri::command]
+async fn collect_meeting_context(
+    app: AppHandle,
+    event_id: String,
+) -> Result<MeetingContextCollection, String> {
+    collect_meeting_context_impl(&app, event_id).await
+}
+
+#[tauri::command]
 fn disconnect_google(app: AppHandle) -> Result<(), String> {
     disconnect_google_impl(&app)
 }
@@ -176,6 +186,7 @@ pub fn run() {
             save_google_client_config,
             connect_google,
             fetch_upcoming_calendar_events,
+            collect_meeting_context,
             disconnect_google
         ])
         .run(tauri::generate_context!())
