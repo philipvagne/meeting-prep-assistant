@@ -358,3 +358,39 @@ The main implementation risk is no longer whether the desktop shell is possible.
 **Negative**
 
 * Requires more roadmap detail up front.
+
+---
+
+# Decision 013
+
+**Status:** Accepted
+
+## Decision
+
+Keep separate Header, Sidebar, and Workspace regions in code while presenting them visually as one calm canvas.
+
+## Context
+
+Phase 1 implementation needs a stable shell architecture that supports distinct responsibilities and future UI growth, but the product-experience direction calls for a quiet desktop utility that does not feel like a dashboard made of separate panels.
+
+## Alternatives Considered
+
+* Visually separate the shell into explicit panels.
+* Collapse the shell into a less structured monolithic surface in code.
+* Keep region separation in code while minimizing perceived visual separation.
+
+## Reason
+
+This approach preserves maintainable component boundaries for the implementation while aligning the visible application with the intended calm, low-cognitive-load product experience.
+
+## Consequences
+
+**Positive**
+
+* Stable shell structure for future Phase 1 work.
+* Better alignment between implementation structure and product experience.
+* Flexibility to refine styling later without undoing shell architecture.
+
+**Negative**
+
+* Visual boundaries must be managed carefully so the UI does not drift back toward a dashboard feel.
