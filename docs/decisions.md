@@ -323,3 +323,38 @@ The application communicates with AI through a provider abstraction rather than 
 The portfolio version initially supports user-configured providers (Gemini and OpenAI). Additional providers can be added by implementing the common AI provider interface.
 
 This design intentionally allows a future backend-managed AI service without requiring changes to the rest of the application.
+
+---
+
+# Decision 012
+
+**Status:** Accepted
+
+## Decision
+
+Organize Phase 1 implementation around desktop product surfaces and UX-focused sprints.
+
+## Context
+
+The validation phase proved the major technical paths, but the original implementation roadmap described Phase 1 only at a very high level. Product specification and product-experience work now provide enough clarity to organize implementation around concrete desktop surfaces instead of generic UI work.
+
+## Alternatives Considered
+
+* Keep Phase 1 as a broad undifferentiated desktop implementation phase.
+* Break Phase 1 into product-surface and UX-oriented sprints.
+
+## Reason
+
+The main implementation risk is no longer whether the desktop shell is possible. It is whether the product structure feels calm, predictable, and useful across Home, Upcoming Meetings, Settings, and the separate brief-reading flow. Organizing the work by user-facing surfaces keeps implementation aligned with the product specification and avoids prematurely pulling prompt quality, ranking, and release tasks into Phase 1.
+
+## Consequences
+
+**Positive**
+
+* Clearer implementation sequencing.
+* Better alignment with product-specification and product-experience work.
+* Cleaner boundaries between UI structure, integration hardening, context quality, and release work.
+
+**Negative**
+
+* Requires more roadmap detail up front.

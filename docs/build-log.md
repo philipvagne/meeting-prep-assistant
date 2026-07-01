@@ -416,3 +416,34 @@ Completed live Spike 4 validation and confirmed that the provider-neutral brief-
 ### Outcome
 
 Spike 4 is now validated and assessed as PASS WITH LIMITATIONS.
+
+## 2026-07-01 - Implementation Phase 1 roadmap expansion
+
+### Summary
+
+Shifted the project documentation from validation-phase planning to active implementation-phase planning.
+
+### Changes
+
+- Updated the roadmap to mark validation as complete and Phase 1 as active.
+- Expanded `Phase 1 - Desktop Application` from a short high-level section into a concrete product-surface implementation plan.
+- Added a Phase 1 sprint breakdown covering:
+  - application shell
+  - navigation and universal search shell
+  - Home / generated briefs inbox
+  - Upcoming Meetings
+  - Settings foundation
+  - brief window
+  - notes interaction
+  - window management and tray flow
+  - UX polish pass
+- Clarified the handoff between phases so:
+  - Phase 2 owns Google integration hardening
+  - Phase 3 owns context engine improvements, ranking, and semantic search
+  - Phase 4 owns prompt quality and meeting-brief quality improvements
+  - Phase 5 owns packaging and release polish
+- Updated README so the repo now reflects the active implementation phase instead of the previous spike-only focus.
+
+### Outcome
+
+The project roadmap now reflects that implementation has started and that Phase 1 is organized around desktop product surfaces and UX-focused sprints.

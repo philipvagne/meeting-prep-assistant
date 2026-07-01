@@ -193,6 +193,10 @@ Unlike the validation phase, implementation focuses on building a polished, main
 
 Implementation phases may revisit, improve, or replace code produced during validation.
 
+Validation is now complete.
+
+The active phase is `Phase 1 - Desktop Application`.
+
 ---
 
 ## Phase 1 — Desktop Application
@@ -201,14 +205,186 @@ Implementation phases may revisit, improve, or replace code produced during vali
 
 Build the production desktop application.
 
+### Status
+
+ACTIVE
+
+### Phase Focus
+
+Phase 1 focuses on desktop product structure, application surfaces, and calm predictable UX.
+
+This phase is informed by:
+
+* `docs/research/product-specification-v1.md`
+* `docs/research/product-experience.md`
+* early wireframes and Figma structure drafts used to validate layout and flow, not final visual design
+
+Phase 1 intentionally does not own:
+
+* final AI prompt quality
+* advanced context ranking
+* semantic search improvements
+* release packaging
+* installer polish
+
+### Product UI Shell
+
 Includes:
 
-* Final desktop architecture
-* Production UI
-* System tray experience
-* Startup behavior
-* Window management
-* Settings foundation
+* Main application layout
+* Permanent header
+* Permanent navigation/sidebar
+* Universal search placement
+* Active content area
+* Stable layout across Home, Upcoming Meetings, and Settings
+
+### Home / Generated Briefs Inbox
+
+Includes:
+
+* Generated brief list
+* Brief cards
+* Open brief behavior
+* Manual delete from brief card menu
+* Auto-delete lifecycle
+* Empty state
+* Internal scrolling
+
+### Upcoming Meetings
+
+Includes:
+
+* Upcoming meeting list
+* Generate brief manually
+* Generation status
+* Brief-ready handoff back to Home
+* Empty state
+
+### Settings Foundation
+
+Includes:
+
+* Google account section
+* AI provider/model section
+* API key setup for portfolio/V1 mode
+* Notification timing
+* Brief auto-delete timing
+* Advanced section for technical settings
+
+### Brief Window
+
+Includes:
+
+* Separate native window
+* Meeting title, time, and description
+* AI-generated bullet-point brief
+* Source reference links
+* Optional attendees section
+* User notes section
+* Hidden technical details/disclosure
+* Copy brief action
+
+### Notes Window / Notes Interaction
+
+Includes:
+
+* Add note flow
+* Save/cancel
+* Notes belong to a specific generated brief
+* Notes should not clutter the default reading experience
+
+### Window Management
+
+Includes:
+
+* Main app window
+* Separate brief window
+* Optional notes popup/window
+* Tray restore behavior
+* Notification click behavior
+
+### Shared UX / States
+
+Includes:
+
+* Error messages that remain visible until dismissed
+* Loading states
+* Empty states
+* Minimal, calm, non-flashy UI behavior
+* Stable layout and predictable navigation
+
+### Sprint Breakdown
+
+#### Sprint 1.1 — Application Shell
+
+Focus:
+
+* Establish the stable desktop shell
+* Implement the main layout regions
+* Define the permanent header, sidebar, and active content area
+
+#### Sprint 1.2 — Navigation + Universal Search Shell
+
+Focus:
+
+* Implement navigation between Home, Upcoming Meetings, and Settings
+* Place universal search in the shell
+* Keep layout behavior stable while screens change
+
+#### Sprint 1.3 — Home / Generated Briefs Inbox
+
+Focus:
+
+* Build the generated brief list and brief cards
+* Implement open-brief behavior
+* Add empty state, internal scrolling, delete action, and auto-delete lifecycle hooks
+
+#### Sprint 1.4 — Upcoming Meetings
+
+Focus:
+
+* Build the upcoming meeting list
+* Support manual brief generation initiation
+* Show generation status and handoff completed briefs back to Home
+
+#### Sprint 1.5 — Settings Foundation
+
+Focus:
+
+* Build Google account and AI provider sections
+* Support provider/model selection and portfolio API key setup
+* Add notification timing and brief auto-delete timing settings
+* Keep advanced technical settings behind an advanced section
+
+#### Sprint 1.6 — Brief Window
+
+Focus:
+
+* Build the separate brief window
+* Present the meeting header, generated brief bullets, source links, and optional attendees
+* Add copy brief and hidden technical details/disclosure
+
+#### Sprint 1.7 — Notes Interaction
+
+Focus:
+
+* Add user notes tied to an individual generated brief
+* Support add, save, and cancel flows
+* Keep notes out of the default reading path
+
+#### Sprint 1.8 — Window Management + Tray Flow
+
+Focus:
+
+* Refine coordination between the main window, brief window, and optional notes popup
+* Complete tray restore behavior and notification-click behavior for the implementation design
+
+#### Sprint 1.9 — Phase 1 UX Polish Pass
+
+Focus:
+
+* Review calmness, clarity, spacing, navigation consistency, and state handling
+* Tighten visible error, loading, and empty states across all Phase 1 surfaces
 
 ---
 
@@ -220,12 +396,13 @@ Build the complete Google Workspace integration.
 
 Includes:
 
-* OAuth
-* Calendar
-* Gmail
-* Google Drive
-* Token management
-* Error handling
+* OAuth hardening
+* Calendar integration hardening
+* Gmail integration hardening
+* Google Drive integration hardening
+* Token lifecycle hardening
+* Secure error handling and recovery
+* Production cleanup of validation-era integration edges
 
 ---
 
@@ -242,6 +419,8 @@ Includes:
 * Relevance filtering
 * Source management
 * Performance improvements
+* Advanced context ranking
+* Semantic search and retrieval improvements
 
 ---
 
@@ -259,6 +438,8 @@ Includes:
 * Brief presentation
 * Notification experience
 * Error states
+* Prompt and brief quality iteration
+* Confidence and uncertainty presentation refinement
 
 ---
 
