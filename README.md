@@ -37,6 +37,7 @@ npm run build
 - Spike 3: Core functionality validated
 - Spike 4: PASS WITH LIMITATIONS
 - Active implementation phase: `Phase 1 - Desktop Application`
+- Active sprint: `Sprint 1.1 - Application Shell`
 
 ## Spike 4 Setup
 

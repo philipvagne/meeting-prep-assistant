@@ -6,6 +6,9 @@ import {
   sendNotification,
 } from "@tauri-apps/plugin-notification";
 
+type AppPage = "home" | "upcoming" | "settings";
+type AiProviderKind = "openAi" | "gemini";
+
 type GoogleAuthStatus = {
   configured: boolean;
   authenticated: boolean;
@@ -16,8 +19,6 @@ type GoogleAuthStatus = {
   grantedScopes: string[];
   hasRequiredScopes: boolean;
 };
-
-type AiProviderKind = "openAi" | "gemini";
 
 type ProviderConfigStatus = {
   provider: AiProviderKind;
@@ -109,6 +110,12 @@ const PROVIDER_OPTIONS: { value: AiProviderKind; label: string; defaultModel: st
   { value: "gemini", label: "Google Gemini", defaultModel: "gemini-2.5-flash" },
 ];
 
+const NAV_ITEMS: { id: AppPage; label: string }[] = [
+  { id: "home", label: "Home" },
+  { id: "upcoming", label: "Upcoming Meetings" },
+  { id: "settings", label: "Settings" },
+];
+
 function formatTimestamp(value: string | number | null) {
   if (value === null) {
     return "Unknown";
@@ -133,7 +140,106 @@ function providerDefaultModel(provider: AiProviderKind) {
   );
 }
 
-function App() {
+function Sidebar({
+  activePage,
+  onNavigate,
+}: {
+  activePage: AppPage;
+  onNavigate: (page: AppPage) => void;
+}) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-group">
+        <div className="search-block">
+          <label className="sidebar-label" htmlFor="shell-search">
+            Search
+          </label>
+          <input
+            id="shell-search"
+            className="shell-search"
+            type="search"
+            placeholder="Search briefs, meetings, notes..."
+          />
+        </div>
+
+        <nav className="shell-nav" aria-label="Main navigation">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`nav-item${activePage === item.id ? " is-active" : ""}`}
+              onClick={() => onNavigate(item.id)}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
+
+    </aside>
+  );
+}
+
+function Header() {
+  return (
+    <header className="app-header">
+      <div className="header-identity">
+        <div className="header-logo" aria-hidden="true">
+          Logo
+        </div>
+        <div>
+          <h1>Meeting Prep Assistant</h1>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function WorkspacePlaceholder({
+  title,
+}: {
+  title: string;
+}) {
+  return (
+    <section className="workspace-placeholder" aria-label={`${title} placeholder`}>
+      <p>{title}</p>
+    </section>
+  );
+}
+
+function HomePage() {
+  return <WorkspacePlaceholder title="Home Workspace" />;
+}
+
+function UpcomingMeetingsPage() {
+  return <WorkspacePlaceholder title="Upcoming Meetings Workspace" />;
+}
+
+function SettingsPage({
+  showDebugTools,
+  onToggleDebugTools,
+}: {
+  showDebugTools: boolean;
+  onToggleDebugTools: () => void;
+}) {
+  return (
+    <div className="settings-layout">
+      <WorkspacePlaceholder title="Settings Workspace" />
+
+      <section className="debug-anchor">
+        <div className="debug-header">
+          <button type="button" className="ghost-button" onClick={onToggleDebugTools}>
+            {showDebugTools ? "Hide Validation Tools" : "Show Validation Tools"}
+          </button>
+        </div>
+
+        {showDebugTools ? <ValidationDebugPanel /> : null}
+      </section>
+    </div>
+  );
+}
+
+function ValidationDebugPanel() {
   const [clientIdInput, setClientIdInput] = useState("");
   const [clientSecretInput, setClientSecretInput] = useState("");
   const [selectedAiProvider, setSelectedAiProvider] = useState<AiProviderKind>("openAi");
@@ -147,7 +253,7 @@ function App() {
   const [generatedBrief, setGeneratedBrief] = useState<GeneratedMeetingBrief | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState(
-    "Spike 4 brief generation validation is ready.",
+    "Legacy Spike validation tools are available here while Phase 1 is under construction.",
   );
 
   function providerStatusFor(provider: AiProviderKind) {
@@ -367,189 +473,135 @@ function App() {
     busyAction === null && !!contextResult && !!aiStatus?.configured;
 
   return (
-    <main className="app-shell">
-      <section className="hero">
-        <p className="eyebrow">Meeting Prep Assistant</p>
-        <h1>Spike 4 Brief Generation &amp; Notification Flow</h1>
-        <p className="intro">
-          This validation build checks whether already-collected Calendar, Gmail,
-          and Drive context can be turned into a concise source-backed meeting brief
-          using a user-selected AI provider and surfaced through the desktop
-          notification flow.
-        </p>
-      </section>
-
-      <section className="panel">
-        <h2>Google Validation Setup</h2>
-        <label className="field-label" htmlFor="google-client-id">
-          Google OAuth desktop client ID
-        </label>
-        <input
-          id="google-client-id"
-          className="text-input"
-          type="text"
-          placeholder="Paste your Google desktop client ID"
-          value={clientIdInput}
-          onChange={(event) => setClientIdInput(event.target.value)}
-        />
-        <label className="field-label" htmlFor="google-client-secret">
-          Google OAuth desktop client secret
-        </label>
-        <input
-          id="google-client-secret"
-          className="text-input"
-          type="password"
-          placeholder={
-            authStatus?.hasClientSecret
-              ? "Client secret already saved locally"
-              : "Paste your Google desktop client secret"
-          }
-          value={clientSecretInput}
-          onChange={(event) => setClientSecretInput(event.target.value)}
-        />
-        <p className="field-help">
-          The Google client ID and client secret are stored locally on this device only.
-          Refresh tokens remain protected separately using Windows-backed secure storage.
-        </p>
-        <div className="button-grid">
-          <button
-            onClick={saveGoogleConfig}
-            type="button"
-            disabled={
-              busyAction !== null || !clientIdInput.trim() || !clientSecretInput.trim()
+    <div className="debug-panel">
+      <div className="debug-grid">
+        <section className="debug-card">
+          <h4>Google Validation Setup</h4>
+          <label className="debug-label" htmlFor="google-client-id">
+            Google OAuth desktop client ID
+          </label>
+          <input
+            id="google-client-id"
+            className="debug-input"
+            type="text"
+            placeholder="Paste your Google desktop client ID"
+            value={clientIdInput}
+            onChange={(event) => setClientIdInput(event.target.value)}
+          />
+          <label className="debug-label" htmlFor="google-client-secret">
+            Google OAuth desktop client secret
+          </label>
+          <input
+            id="google-client-secret"
+            className="debug-input"
+            type="password"
+            placeholder={
+              authStatus?.hasClientSecret
+                ? "Client secret already saved locally"
+                : "Paste your Google desktop client secret"
             }
+            value={clientSecretInput}
+            onChange={(event) => setClientSecretInput(event.target.value)}
+          />
+          <div className="debug-actions">
+            <button
+              onClick={saveGoogleConfig}
+              type="button"
+              disabled={
+                busyAction !== null || !clientIdInput.trim() || !clientSecretInput.trim()
+              }
+            >
+              Save Google config
+            </button>
+            <button onClick={connectGoogle} type="button" disabled={!canConnectGoogle}>
+              Connect Google
+            </button>
+            <button onClick={disconnectGoogle} type="button" className="debug-secondary">
+              Disconnect Google
+            </button>
+          </div>
+        </section>
+
+        <section className="debug-card">
+          <h4>AI Validation Setup</h4>
+          <label className="debug-label" htmlFor="ai-provider-select">
+            AI provider
+          </label>
+          <select
+            id="ai-provider-select"
+            className="debug-input"
+            value={selectedAiProvider}
+            onChange={(event) => {
+              const nextProvider = event.target.value as AiProviderKind;
+              setSelectedAiProvider(nextProvider);
+              setProviderModelInput(
+                providerStatusFor(nextProvider)?.model ?? providerDefaultModel(nextProvider),
+              );
+              setProviderApiKeyInput("");
+            }}
           >
-            Save Google config
-          </button>
-          <button onClick={connectGoogle} type="button" disabled={!canConnectGoogle}>
-            {authStatus?.authenticated && !authStatus?.hasRequiredScopes
-              ? "Upgrade Google access"
-              : "Connect Google"}
-          </button>
-          <button onClick={disconnectGoogle} type="button" className="secondary">
-            Disconnect Google
-          </button>
-        </div>
-      </section>
+            {PROVIDER_OPTIONS.map((provider) => (
+              <option key={provider.value} value={provider.value}>
+                {provider.label}
+              </option>
+            ))}
+          </select>
+          <label className="debug-label" htmlFor="provider-api-key">
+            {providerLabel(selectedAiProvider)} API key
+          </label>
+          <input
+            id="provider-api-key"
+            className="debug-input"
+            type="password"
+            placeholder={
+              selectedProviderStatus?.hasApiKey
+                ? `${providerLabel(selectedAiProvider)} API key already saved locally`
+                : `Paste your local ${providerLabel(selectedAiProvider)} API key`
+            }
+            value={providerApiKeyInput}
+            onChange={(event) => setProviderApiKeyInput(event.target.value)}
+          />
+          <label className="debug-label" htmlFor="provider-model">
+            {providerLabel(selectedAiProvider)} model
+          </label>
+          <input
+            id="provider-model"
+            className="debug-input"
+            type="text"
+            placeholder={providerDefaultModel(selectedAiProvider)}
+            value={providerModelInput}
+            onChange={(event) => setProviderModelInput(event.target.value)}
+          />
+          <div className="debug-actions">
+            <button onClick={saveAiConfig} type="button" disabled={busyAction !== null}>
+              Save AI config
+            </button>
+          </div>
+        </section>
+      </div>
 
-      <section className="panel">
-        <h2>AI Validation Setup</h2>
-        <label className="field-label" htmlFor="ai-provider-select">
-          AI provider
-        </label>
-        <select
-          id="ai-provider-select"
-          className="text-input"
-          value={selectedAiProvider}
-          onChange={(event) => {
-            const nextProvider = event.target.value as AiProviderKind;
-            setSelectedAiProvider(nextProvider);
-            setProviderModelInput(
-              providerStatusFor(nextProvider)?.model ?? providerDefaultModel(nextProvider),
-            );
-            setProviderApiKeyInput("");
-          }}
-        >
-          {PROVIDER_OPTIONS.map((provider) => (
-            <option key={provider.value} value={provider.value}>
-              {provider.label}
-            </option>
-          ))}
-        </select>
-        <label className="field-label" htmlFor="provider-api-key">
-          {providerLabel(selectedAiProvider)} API key
-        </label>
-        <input
-          id="provider-api-key"
-          className="text-input"
-          type="password"
-          placeholder={
-            selectedProviderStatus?.hasApiKey
-              ? `${providerLabel(selectedAiProvider)} API key already saved locally`
-              : `Paste your local ${providerLabel(selectedAiProvider)} API key`
-          }
-          value={providerApiKeyInput}
-          onChange={(event) => setProviderApiKeyInput(event.target.value)}
-        />
-        <label className="field-label" htmlFor="provider-model">
-          {providerLabel(selectedAiProvider)} model
-        </label>
-        <input
-          id="provider-model"
-          className="text-input"
-          type="text"
-          placeholder={providerDefaultModel(selectedAiProvider)}
-          value={providerModelInput}
-          onChange={(event) => setProviderModelInput(event.target.value)}
-        />
-        <p className="field-help">
-          The selected provider becomes the active brief-generation path. API keys are
-          stored locally only, one per provider, and only the selected event's minimal
-          Calendar, Gmail, and Drive context is sent to the provider.
-        </p>
-        <div className="button-grid">
-          <button onClick={saveAiConfig} type="button" disabled={busyAction !== null}>
-            Save AI config
-          </button>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>Status</h2>
-        <dl className="status-grid">
+      <section className="debug-card">
+        <h4>Validation Flow</h4>
+        <div className="debug-status-grid">
           <div>
-            <dt>Google authenticated</dt>
-            <dd>{authStatus === null ? "Checking..." : String(authStatus.authenticated)}</dd>
+            <span>Google authenticated</span>
+            <strong>{authStatus === null ? "Checking..." : String(authStatus.authenticated)}</strong>
           </div>
           <div>
-            <dt>Google scopes granted</dt>
-            <dd>
-              {authStatus === null
-                ? "Checking..."
-                : authStatus.grantedScopes.length === 0
-                  ? "None yet"
-                  : authStatus.grantedScopes.join(", ")}
-            </dd>
+            <span>Selected AI provider</span>
+            <strong>{aiStatus === null ? "Checking..." : aiStatus.selectedProviderLabel}</strong>
           </div>
           <div>
-            <dt>Selected AI provider</dt>
-            <dd>{aiStatus === null ? "Checking..." : aiStatus.selectedProviderLabel}</dd>
+            <span>Selected provider ready</span>
+            <strong>{aiStatus === null ? "Checking..." : String(aiStatus.configured)}</strong>
           </div>
           <div>
-            <dt>Selected provider ready</dt>
-            <dd>{aiStatus === null ? "Checking..." : String(aiStatus.configured)}</dd>
-          </div>
-          <div>
-            <dt>Selected model</dt>
-            <dd>{selectedProviderStatus?.model ?? providerModelInput}</dd>
-          </div>
-          <div>
-            <dt>Requested scopes</dt>
-            <dd>{REQUESTED_SCOPES.join(", ")}</dd>
-          </div>
-        </dl>
-        <div className="subsection">
-          <h3>Provider Readiness</h3>
-          <div className="source-grid">
-            {aiStatus?.providers.map((provider) => (
-              <article key={provider.provider} className="event-card">
-                <h4>{provider.label}</h4>
-                <p>Model: {provider.model}</p>
-                <p>API key saved: {String(provider.hasApiKey)}</p>
-                <p>Configured: {String(provider.configured)}</p>
-              </article>
-            )) ?? <p className="empty-state">Checking AI provider status...</p>}
+            <span>Requested scopes</span>
+            <strong>{REQUESTED_SCOPES.join(", ")}</strong>
           </div>
         </div>
-      </section>
 
-      <section className="panel">
-        <h2>Manual Validation Flow</h2>
-        <p className="field-help">
-          Fetch one upcoming event, collect context, then generate a brief manually from
-          that selected event only using the currently selected AI provider.
-        </p>
-        <div className="button-grid">
+        <div className="debug-actions">
           <button onClick={fetchUpcomingEvents} type="button" disabled={!canUseContextFlow}>
             Fetch upcoming events
           </button>
@@ -564,12 +616,13 @@ function App() {
             Generate brief
           </button>
         </div>
-        <label className="field-label" htmlFor="event-select">
+
+        <label className="debug-label" htmlFor="event-select">
           Upcoming calendar event
         </label>
         <select
           id="event-select"
-          className="text-input"
+          className="debug-input"
           value={selectedEventId}
           onChange={(event) => setSelectedEventId(event.target.value)}
           disabled={events.length === 0}
@@ -583,145 +636,81 @@ function App() {
         </select>
       </section>
 
-      <section className="panel">
-        <h2>Collected Context</h2>
-        {contextResult === null ? (
-          <p className="empty-state">No context has been collected yet.</p>
-        ) : (
-          <>
-            <div className="subsection">
-              <h3>Calendar Seed</h3>
-              <div className="event-card">
-                <p>Title: {contextResult.seed.summary}</p>
-                <p>Start: {formatTimestamp(contextResult.seed.start)}</p>
-                <p>End: {formatTimestamp(contextResult.seed.end)}</p>
-                <p>Status: {contextResult.seed.status ?? "unknown"}</p>
-                <p>
-                  Attendees:{" "}
-                  {contextResult.seed.attendeeEmails.length === 0
-                    ? "None exposed"
-                    : contextResult.seed.attendeeEmails.join(", ")}
-                </p>
-                <p>
-                  Description preview:{" "}
-                  {contextResult.seed.descriptionPreview ?? "No description available"}
-                </p>
-              </div>
-            </div>
-
-            <div className="subsection">
-              <h3>Gmail Results</h3>
-              {contextResult.gmailResults.length === 0 ? (
-                <p className="empty-state">No Gmail results found for this event.</p>
-              ) : (
-                <div className="source-grid">
-                  {contextResult.gmailResults.map((message) => (
-                    <article key={message.id} className="event-card">
-                      <h4>{message.subject}</h4>
-                      <p>From: {message.from ?? "Unknown sender"}</p>
-                      <p>Date: {message.date ?? "Unknown date"}</p>
-                      <p>Snippet: {message.snippet ?? "No snippet available"}</p>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="subsection">
-              <h3>Drive Results</h3>
-              {contextResult.driveResults.length === 0 ? (
-                <p className="empty-state">No Drive results found for this event.</p>
-              ) : (
-                <div className="source-grid">
-                  {contextResult.driveResults.map((file) => (
-                    <article key={file.id} className="event-card">
-                      <h4>{file.name}</h4>
-                      <p>MIME type: {file.mimeType ?? "Unknown type"}</p>
-                      <p>Modified: {formatTimestamp(file.modifiedTime)}</p>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="subsection">
-              <h3>Validation Notes</h3>
-              {contextResult.notes.length === 0 ? (
-                <p className="empty-state">No additional notes.</p>
-              ) : (
-                <ul>
-                  {contextResult.notes.map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </>
-        )}
-      </section>
-
-      <section className="panel">
-        <h2>Generated Brief</h2>
-        {generatedBrief === null ? (
-          <p className="empty-state">No meeting brief generated yet.</p>
-        ) : (
-          <>
-            <div className="status-grid">
-              <div>
-                <dt>Meeting</dt>
-                <dd>{generatedBrief.meetingTitle}</dd>
-              </div>
-              <div>
-                <dt>Provider</dt>
-                <dd>{generatedBrief.providerLabel}</dd>
-              </div>
-              <div>
-                <dt>Model</dt>
-                <dd>{generatedBrief.model}</dd>
-              </div>
-              <div>
-                <dt>Confidence</dt>
-                <dd>{generatedBrief.confidenceLabel}</dd>
-              </div>
-              <div>
-                <dt>Context strength</dt>
-                <dd>{generatedBrief.contextStrength}</dd>
-              </div>
-            </div>
-            <pre className="brief-output">{generatedBrief.briefMarkdown}</pre>
-            <div className="subsection">
-              <h3>Sources</h3>
-              <div className="source-grid">
-                {generatedBrief.sources.map((source) => (
-                  <article key={source.sourceId} className="event-card">
-                    <h4>{source.sourceId}</h4>
-                    <p>{source.sourceType}</p>
-                    <p>{source.label}</p>
-                    {source.link ? (
-                      <p>
-                        <a href={source.link} target="_blank" rel="noreferrer">
-                          Open source
-                        </a>
-                      </p>
-                    ) : null}
-                  </article>
+      <div className="debug-grid">
+        <section className="debug-card">
+          <h4>Collected Context</h4>
+          {contextResult === null ? (
+            <p className="debug-empty">No context has been collected yet.</p>
+          ) : (
+            <>
+              <p>
+                <strong>Seed:</strong> {contextResult.seed.summary}
+              </p>
+              <p>
+                <strong>Gmail results:</strong> {contextResult.gmailResults.length}
+              </p>
+              <p>
+                <strong>Drive results:</strong> {contextResult.driveResults.length}
+              </p>
+              <ul className="debug-list">
+                {contextResult.notes.map((note) => (
+                  <li key={note}>{note}</li>
                 ))}
-              </div>
-            </div>
-          </>
-        )}
-      </section>
+              </ul>
+            </>
+          )}
+        </section>
 
-      <section className="panel">
-        <h2>Spike Guardrails</h2>
-        <ul>
-          <li>Only selected-event context is sent to the active AI provider.</li>
-          <li>No OAuth tokens, Google client credentials, or provider API keys are sent in the brief prompt.</li>
-          <li>No Google write permissions are requested or used.</li>
-          <li>The app uses the tray restore path as the supported way to return and view the generated brief.</li>
-        </ul>
-        <p className="status-message">{statusMessage}</p>
-      </section>
+        <section className="debug-card">
+          <h4>Generated Brief</h4>
+          {generatedBrief === null ? (
+            <p className="debug-empty">No brief generated yet.</p>
+          ) : (
+            <>
+              <p>
+                <strong>Meeting:</strong> {generatedBrief.meetingTitle}
+              </p>
+              <p>
+                <strong>Provider:</strong> {generatedBrief.providerLabel}
+              </p>
+              <p>
+                <strong>Model:</strong> {generatedBrief.model}
+              </p>
+              <pre className="debug-brief-output">{generatedBrief.briefMarkdown}</pre>
+            </>
+          )}
+        </section>
+      </div>
+
+      <p className="debug-status-message">{statusMessage}</p>
+    </div>
+  );
+}
+
+function App() {
+  const [activePage, setActivePage] = useState<AppPage>("home");
+  const [showDebugTools, setShowDebugTools] = useState(false);
+
+  return (
+    <main className="desktop-shell">
+      <Sidebar activePage={activePage} onNavigate={setActivePage} />
+
+      <div className="main-shell">
+        <Header />
+
+        <section className="content-region">
+          <div className="content-scroll">
+            {activePage === "home" ? <HomePage /> : null}
+            {activePage === "upcoming" ? <UpcomingMeetingsPage /> : null}
+            {activePage === "settings" ? (
+              <SettingsPage
+                showDebugTools={showDebugTools}
+                onToggleDebugTools={() => setShowDebugTools((current) => !current)}
+              />
+            ) : null}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

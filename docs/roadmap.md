@@ -317,6 +317,10 @@ Includes:
 
 #### Sprint 1.1 — Application Shell
 
+Status:
+
+* ACTIVE
+
 Focus:
 
 * Establish the stable desktop shell

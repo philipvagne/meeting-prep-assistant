@@ -447,3 +447,164 @@ Shifted the project documentation from validation-phase planning to active imple
 ### Outcome
 
 The project roadmap now reflects that implementation has started and that Phase 1 is organized around desktop product surfaces and UX-focused sprints.
+
+## 2026-07-01 - Sprint 1.1 application shell
+
+### Summary
+
+Built the first production-oriented desktop shell for Phase 1 and replaced the spike-first app surface with a stable main-window structure.
+
+### Changes
+
+- Added a permanent application shell with:
+  - fixed header
+  - fixed left sidebar
+  - sidebar search placement
+  - navigation between Home, Upcoming Meetings, and Settings
+  - active content region prepared for future internal scrolling
+- Added placeholder content pages for:
+  - Home
+  - Upcoming Meetings
+  - Settings
+- Kept the shell intentionally calm and sparse so later Phase 1 surfaces can plug in without reworking layout.
+- Preserved the validated Spike controls by isolating them behind a temporary debug area inside Settings instead of mixing them into the default product shell.
+- Updated the desktop window title from the previous spike-specific label to the product name.
+
+### Validation Notes
+
+- `npm run build` should confirm the React shell compiles successfully.
+- `npm run tauri dev` remains the closest desktop-shell runtime check if the local Vite dev port is available.
+- Manual validation for this sprint should focus on:
+  - shell layout visibility
+  - fixed header/sidebar behavior
+  - navigation switching only the active content region
+  - reasonable resize behavior
+
+### Outcome
+
+Sprint 1.1 now provides the production shell foundation that later Phase 1 surfaces can build on.
+
+## 2026-07-01 - Sprint 1.1 shell structure alignment
+
+### Summary
+
+Adjusted the visible Sprint 1.1 shell to follow the low-fidelity wireframe structure more closely.
+
+### Changes
+
+- Simplified the header to logo placeholder plus application name only.
+- Removed the visible phase and sprint badge from the product UI.
+- Simplified the workspace area so each active page shows one large structural placeholder region.
+- Removed the more dashboard-like explanatory placeholder cards and copy from the main workspace.
+- Kept the permanent sidebar, permanent header, sidebar search placement, and active content switching intact.
+
+### Outcome
+
+The Sprint 1.1 shell now reads more like a low-fidelity desktop structure draft and less like a staged SaaS dashboard.
+
+## 2026-07-01 - Sprint 1.1 final shell polish
+
+### Summary
+
+Applied the final Sprint 1.1 visual refinement pass so the shell feels more like one calm desktop application surface and less like separated panels.
+
+### Changes
+
+- Reduced the remaining visible separation between sidebar, header, and workspace.
+- Removed the remaining navigation hint text so the sidebar stays quieter.
+- Softened backgrounds, borders, and placeholder contrast across the shell.
+- Kept the overall wireframe structure intact while making region boundaries rely more on spacing and alignment than on dividers.
+
+### Outcome
+
+Sprint 1.1 now ends with a quieter, more unified shell that stays intentionally low fidelity while matching the intended product philosophy more closely.
+
+## 2026-07-01 - Sprint 1.1 final canvas surface pass
+
+### Summary
+
+Completed the last Sprint 1.1 styling pass to preserve the shell's component structure in code while making the window read more like one calm desktop canvas.
+
+### Changes
+
+- Kept the permanent header, permanent sidebar, and swappable workspace as separate regions in code.
+- Removed the remaining panel feel by:
+  - moving the shared smoky-white treatment to the overall app surface
+  - keeping region backgrounds transparent
+  - further softening search, navigation, logo, and workspace placeholder surfaces
+- Reduced the visual weight of the workspace placeholder so it behaves more like a temporary structural marker than a framed panel.
+- Left the hidden validation tools in Settings unchanged apart from inheriting the softer shell treatment.
+
+### Outcome
+
+Sprint 1.1 now reads as one desktop application surface with interface elements placed on it, while keeping the implementation organized around stable shell components.
+
+## 2026-07-01 - Atmospheric background experiment
+
+### Summary
+
+Ran a narrow visual experiment on the shared application background to test whether a softer atmospheric surface improves the shell's calmness without changing layout or component structure.
+
+### Changes
+
+- Replaced the previous root background wash with multiple very large, low-opacity radial gradients.
+- Kept the header, sidebar, and workspace backgrounds unchanged and transparent so the interface still reads as one continuous surface.
+- Limited the palette to neutral off-white, soft silver, warm grey, and cool grey tones.
+
+### Outcome
+
+The shell now has slightly more warmth and depth at the root surface level while remaining intentionally subtle and structurally unchanged.
+
+## 2026-07-01 - Atmospheric background visibility adjustment
+
+### Summary
+
+Adjusted the shared root background experiment so the neutral atmospheric lighting reads more clearly on screen without turning into a noticeable decorative gradient.
+
+### Changes
+
+- Increased the opacity of the existing large radial background fields by a conservative amount.
+- Added slightly more visible warm-silver presence toward the upper-left/sidebar side.
+- Added a slightly more visible cool-grey field toward the lower-right.
+- Kept the center area calmer for readability.
+- Left header, sidebar, and workspace region treatments unchanged and transparent.
+
+### Outcome
+
+The shell background is now more visibly distinct from flat off-white while staying soft, neutral, and non-distracting.
+
+## 2026-07-01 - Atmospheric background perceptibility adjustment
+
+### Summary
+
+Changed the shared root background approach from mostly white highlight layers to darker neutral silver and grey radial fields so the atmospheric surface is actually perceptible on screen.
+
+### Changes
+
+- Removed the white-dominant highlight treatment from the shared root background.
+- Replaced it with:
+  - a soft warm-silver field near the top-left/sidebar area
+  - a warm-grey field near the upper-right
+  - a cool silver-grey field near the lower-right
+- Kept the gradients large, feathered, and low-contrast enough to stay calm.
+- Left header, sidebar, workspace, layout, and component structure unchanged.
+
+### Outcome
+
+The shell background is now intentionally visible as a soft silver/grey atmospheric surface instead of reading like flat off-white.
+
+## 2026-07-01 - Atmospheric background cooling adjustment
+
+### Summary
+
+Adjusted the shared atmospheric background palette to reduce beige warmth and shift the visible surface toward calmer neutral silver-grey.
+
+### Changes
+
+- Replaced the warmer silver and warm-grey radial values with cooler neutral silver-grey values.
+- Shifted the root base color from a warmer off-white to a cooler neutral off-white.
+- Kept the same large radial-gradient structure, transparent regions, and overall contrast level.
+
+### Outcome
+
+The atmospheric background remains visible, but now reads more silver-grey and less warm paper/beige.
